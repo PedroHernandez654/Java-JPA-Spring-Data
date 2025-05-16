@@ -21,7 +21,7 @@ public class PizzaService {
 
     public List<PizzaEntity>getAll(){
         //Esto nos permite hacer consultas de SQL y convertirlas a clases JAVA
-        return this.jdbcTemplate.query("SELECT * FROM pizza", new BeanPropertyRowMapper<>(PizzaEntity.class));
+        return this.jdbcTemplate.query("SELECT * FROM pizza WHERE available = 0", new BeanPropertyRowMapper<>(PizzaEntity.class));
     }
 
 }
