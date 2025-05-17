@@ -23,7 +23,11 @@ public class PizzaService {
         //Esto nos permite hacer consultas de SQL y convertirlas a clases JAVA
         //Esto es JDBC
         //return this.jdbcTemplate.query("SELECT * FROM pizza WHERE available = 0", new BeanPropertyRowMapper<>(PizzaEntity.class));
-        return this.jdbcTemplate.query("SELECT * FROM pizza", new BeanPropertyRowMapper<>(PizzaEntity.class));
+        //return this.jdbcTemplate.query("SELECT * FROM pizza", new BeanPropertyRowMapper<>(PizzaEntity.class));
+        return this.pizzaRepository.findAll();
     }
 
+    public PizzaEntity get(int idPizza){
+        return this.pizzaRepository.findById(idPizza).orElse(null);
+    }
 }
