@@ -1,5 +1,6 @@
 package com.platzi.pizza.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,8 +29,10 @@ public class OrderItemEntity {
     //Siempre las relaciones son al final como buena práctica
     @ManyToOne
     @JoinColumn(name = "id_order", referencedColumnName = "id_order", insertable = false, updatable = false)
+    @JsonIgnore
+    /*Al tener un llamado igual en OrderEntity se hace un loop al tratar de formar el JSON por lo que es necesario
+    poner este JsonIgnore para que no entre en loop infinito*/
     private OrderEntity order;
-
 
     @OneToOne
     //De esta manera aplicamos la relación con la columna de la tabla
