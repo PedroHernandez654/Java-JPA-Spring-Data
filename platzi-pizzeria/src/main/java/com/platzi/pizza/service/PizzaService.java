@@ -1,30 +1,39 @@
 package com.platzi.pizza.service;
 
 import com.platzi.pizza.persistence.entity.PizzaEntity;
+import com.platzi.pizza.persistence.repository.PizzaPagSortRepository;
 import com.platzi.pizza.persistence.repository.PizzaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+//Este es el import que necesitamos para el page de nuestro servicio
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Service
 public class PizzaService {
     private final PizzaRepository pizzaRepository;
+    private final PizzaPagSortRepository pagSortRepository;
 
     //Inyección de dependencias
     @Autowired
-    public PizzaService(PizzaRepository pizzaRepository) {
+    public PizzaService(PizzaRepository pizzaRepository, PizzaPagSortRepository pagSortRepository) {
         this.pizzaRepository = pizzaRepository;
+        this.pagSortRepository = pagSortRepository;
     }
-
-    public List<PizzaEntity>getAll(){
+    //Los parametros que necesitamos para que podamos utilizar nuestro paginación es "Número de página y cuantos
+    //elementos vamos a mostrar
+    public Page<PizzaEntity> getAll(int page, int elements){
         //Esto nos permite hacer consultas de SQL y convertirlas a clases JAVA
         //Esto es JDBC
         //return this.jdbcTemplate.query("SELECT * FROM pizza WHERE available = 0", new BeanPropertyRowMapper<>(PizzaEntity.class));
         //return this.jdbcTemplate.query("SELECT * FROM pizza", new BeanPropertyRowMapper<>(PizzaEntity.class));
-        return this.pizzaRepository.findAll();
+        Pageable pageRequest = PageRequest.of(page,elements);
+        return this.pagSortRepository.findAll(pageRequest);
     }
 
     public List<PizzaEntity>getAvailable(){
@@ -33,7 +42,7 @@ public class PizzaService {
     }
 
     public PizzaEntity getByName(String name){
-        return this.pizzaRepository.findAllByAvailableTrueAndNameIgnoreCase(name);
+        return this.pizzaRepository.findFirstByAvailableTrueAndNameIgnoreCase(name).orElseThrow(()-> new RuntimeException("La pizza no existe"));
     }
 
     public List<PizzaEntity>getWith(String ingredient){
@@ -42,6 +51,9 @@ public class PizzaService {
 
     public List<PizzaEntity>getWithout(String ingredient){
         return  this.pizzaRepository.findAllByAvailableTrueAndDescriptionNotContainingIgnoreCase(ingredient);
+    }
+    public List<PizzaEntity>getCheapest(double price){
+        return  this.pizzaRepository.findTop3ByAvailableTrueAndPriceLessThanEqualOrderByPriceAsc(price);
     }
 
     public PizzaEntity get(int idPizza){
