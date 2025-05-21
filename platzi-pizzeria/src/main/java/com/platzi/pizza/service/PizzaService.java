@@ -3,6 +3,8 @@ package com.platzi.pizza.service;
 import com.platzi.pizza.persistence.entity.PizzaEntity;
 import com.platzi.pizza.persistence.repository.PizzaPagSortRepository;
 import com.platzi.pizza.persistence.repository.PizzaRepository;
+import com.platzi.pizza.service.dto.UpdatePizzaPriceDto;
+import com.platzi.pizza.service.exception.EmailApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +15,9 @@ import org.springframework.stereotype.Service;
 
 //Este es el import que necesitamos para el page de nuestro servicio
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
@@ -73,6 +78,18 @@ public class PizzaService {
 
     public void delete(int idPizza){
         this.pizzaRepository.deleteById(idPizza);
+    }
+
+    //Esta anotación nos brinda las propiedades de ACID
+    //Al igual que podemos limitar hasta cuando si hacer o no un rollback ya que puede que 1 acción no dependa de TODO
+    @Transactional(noRollbackFor = EmailApiException.class, propagation = Propagation.REQUIRED)
+    public void updatePrice(UpdatePizzaPriceDto dto){
+        this.pizzaRepository.updatePrice(dto);
+        this.sendEmail();
+    }
+
+    private void sendEmail(){
+        throw new EmailApiException();
     }
 
     public boolean exists(int idPizza){
