@@ -37,5 +37,7 @@ public class OrderEntity {
     private CustomerEntity customer;
     //Se le coloca el nombre del atributo que está en la clase que tiene ManyToOne o sea con la relación contraria
     @OneToMany(mappedBy = "order", fetch = FetchType.EAGER)/*Esto siginifica que si o si me traiga la relación*/
+    //Esta anotación sirve para poder ordenar por {propiedad} de manera {ASC/DESC} desde tu modelo OrderItemEntity (Hibernate)
+    @OrderBy("price ASC")
     private List<OrderItemEntity> items;
 }
