@@ -6,6 +6,7 @@ import com.platzi.pizza.persistence.repository.PizzaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -36,9 +37,15 @@ public class PizzaService {
         return this.pagSortRepository.findAll(pageRequest);
     }
 
-    public List<PizzaEntity>getAvailable(){
+
+
+    public Page<PizzaEntity>getAvailable(int page, int elements, String sortBy, String sortDirection){
         System.out.println(this.pizzaRepository.countByVeganTrue());
-        return this .pizzaRepository.findAllByAvailableTrueOrderByPrice();
+        //De esta manera hacemos uso del ordanamiento con Dirección
+        Sort sort  = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+        Pageable pageRequest = PageRequest.of(page,elements, sort);
+
+        return this .pagSortRepository.findByAvailableTrue(pageRequest);
     }
 
     public PizzaEntity getByName(String name){
